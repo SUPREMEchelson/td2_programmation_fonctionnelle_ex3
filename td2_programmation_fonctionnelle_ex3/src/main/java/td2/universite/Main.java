@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 public class Main {
     public static  final Predicate<Etudiant> toujours = x-> true;
+
     public static final Set<Matiere> toutesLesMatieresDeLAnnee(Annee a){
         Set<Matiere> rtr = new HashSet<>();
         for (UE ue: a.ues()){
@@ -15,29 +16,45 @@ public class Main {
         }
         return rtr;
     }
-    private static Set<Matiere> toutesLesMatieresDeLetudiant(Annee annee) {
-    boolean rtr =false;
-    Set<Matiere> toutesLesMatieresDeLetudiant = Main.toutesLesMatieresDeLetudiant(x.annee());
-        Matiere[] toutesLesMatiersDeLetudiant;
-        for(Matiere m : toutesLesMatiersDeLetudiant).constainsKey(m)){
-        rtr = true;
-    }
-    return rtr;
-    }        
-            
-     
 
     public static   final Predicate<Etudiant> defaillant = e -> {
-        Set<Matiere> toutesLesMatieresDeLetudiant = Main.toutesLesMatieresDeLetudiant(e.annee());
-        for (Matiere  m: toutesLesMatieresDeLetudiant){
-            // m n'est pas une cles dans la map  de notes
-            if(!e.notes().containsKey(m)){
-                return true;
-            }
+        Set<Matiere> toutesLesMatieresDeLetudiant = Main.toutesLesMatieresDeLAnnee(e.annee());
+            for (Matiere m : toutesLesMatieresDeLetudiant) {
+                // m n'est pas une cles dans la map  de notes
+                if (!e.notes().containsKey(m)) {
+                    return true;
+                }
 
-        }
+            }
+            return false;
+        };
+
+    public static final Predicate<Etudiant> aNoteEliminatoire = f->{
+            for(UE u : f.annee().ues()){
+                for(Map.Entry<Matiere,Integer> ect : u.ects().entrySet()){
+                    if(f.notes().containsKey(ect.getKey()) && f.notes().get(ect.getKey()) <6.0) return true;
+                }
+            }
         return false;
-    }
+        };
+
+    public static Double moyennne(Etudiant e) {
+        Double somme = 0.0;
+        Double resultat = null;
+        if (defaillant.test(e)) {
+            return null;
+        } else {
+            for (UE u : e.annee().ues()) {
+                for (Map.Entry<Matiere, Integer> ect : u.ects().entrySet()) {
+                    if (e.notes().containsKey(ect.getKey())) {
+                        // somme += e.notes().entrySet();
+
+                    }
+                }
+            }
+        }
+    return resultat;}
+    
 
 
     public static void afficheSi2(String entete, Predicate<Etudiant> condition, Annee annee) {
@@ -48,6 +65,7 @@ public class Main {
 
         }
     }
+
 
 
 
@@ -72,7 +90,10 @@ public class Main {
         e3.noter(m3, 14.0);
 
         afficheSi2("tous les etudiants",x->true,a1);
-        afficheSi2("Etudiant defaillaint",aDef,a1);
+        afficheSi2("Etudiant defaillaint",defaillant,a1);
+
+       afficheSi2("ETUDIANT AVEC NOTES ELIMINATOIRE",aNoteEliminatoire,a1);
+
 
 
     }
